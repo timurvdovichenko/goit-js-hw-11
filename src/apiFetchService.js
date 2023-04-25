@@ -22,19 +22,19 @@ export default class ApiFetchService {
       );
       // console.log(response);
       const data = await response.data;
-      console.log(data);
+      // console.log(data);
 
       if (data.total === 0) {
         Notify.failure('Sorry, there are no images matching your search query. Please try again.');
         this.#onAddClassBtn();
         return;
-      } else if (data.hits.length < 40) {
+      } else if (data.hits.length < quantityImg) {
         Notify.info("We're sorry, but you've reached the end of search results.");
         this.#onAddClassBtn();
         this.#onImageMarkupCardList(data.hits);
         return;
       } else if (this.page >= 2) {
-        console.log(data.totalHits);
+        // console.log(data.totalHits);
         Notify.info(`Hooray! We found ${data.totalHits} images.`);
         this.#onImageMarkupCardList(data.hits);
         this.#onRemoveClassBtn();
@@ -43,18 +43,9 @@ export default class ApiFetchService {
         this.#onImageMarkupCardList(data.hits);
         this.#onRemoveClassBtn();
       }
-
-      // console.log(response.data.hits.length);
-      // console.log(data);
-
-      // await this.loadMoreBtnPosition.classList.remove('.is-hidden');
-
-      // const ddd = await this.loadMorePositionData.classList.remove('.is-hidden');
-      // console.log(ddd);
-
-      // console.log(markupCardList);
     } catch (err) {
       console.log(err.message);
+      Notify.failure(`Oops, something went wrong, error message is "${err.message}"`);
     }
   }
 
@@ -113,7 +104,4 @@ export default class ApiFetchService {
   #onAddClassBtn() {
     this.loadMorePositionData.classList.add('is-hidden');
   }
-  // #clearGalleryMarkup() {
-  //   this.markupInsertHTML.innerHTML = '';
-  // }
 }
