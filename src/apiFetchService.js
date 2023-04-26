@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Notify } from 'notiflix';
+import SimpleLightbox from 'simplelightbox';
 
 const FETCH_URL = 'https://pixabay.com/api/';
 const API_KEY = '35728571-e5e325dee746f09c3ee4748c1';
@@ -32,16 +33,29 @@ export default class ApiFetchService {
         Notify.info("We're sorry, but you've reached the end of search results.");
         this.#onAddClassBtn();
         this.#onImageMarkupCardList(data.hits);
+        let galleryImg = new SimpleLightbox('.photo-card a', {
+          captionDelay: 150,
+          captionsData: 'alt',
+        });
+
         return;
       } else if (this.page >= 2) {
         // console.log(data.totalHits);
         Notify.info(`Hooray! We found ${data.totalHits} images.`);
         this.#onImageMarkupCardList(data.hits);
         this.#onRemoveClassBtn();
+        let galleryImg = new SimpleLightbox('.photo-card a', {
+          captionDelay: 150,
+          captionsData: 'alt',
+        });
         return;
       } else {
         this.#onImageMarkupCardList(data.hits);
         this.#onRemoveClassBtn();
+        new SimpleLightbox('.photo-card a', {
+          captionDelay: 150,
+          captionsData: 'alt',
+        });
       }
     } catch (err) {
       console.log(err.message);
@@ -74,7 +88,7 @@ export default class ApiFetchService {
 
   #onImageMarkupCard({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) {
     return `<div class="photo-card">
-  <img src="${webformatURL}" alt="${tags}" loading="lazy" />
+<a href="${largeImageURL}"><img src="${webformatURL}" alt="${tags}" loading="lazy" /></a>
   <div class="info">
     <p class="info-item">
       <b>Likes: </b> ${likes}
