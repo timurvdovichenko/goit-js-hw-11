@@ -23,39 +23,30 @@ export default class ApiFetchService {
       );
       // console.log(response);
       const data = await response.data;
-      // console.log(data);
+      let pagesToShow = Math.floor(data.totalHits / quantityImg);
 
       if (data.total === 0) {
         Notify.failure('Sorry, there are no images matching your search query. Please try again.');
-        this.#onAddClassBtn();
+        // this.#onAddClassBtn();
         return;
-      } else if (data.hits.length < quantityImg) {
+      }
+      await this.#onImageMarkupCardList(data.hits);
+      // else
+      if (this.page === pagesToShow) {
         Notify.info("We're sorry, but you've reached the end of search results.");
-        this.#onAddClassBtn();
-        this.#onImageMarkupCardList(data.hits);
-        let galleryImg = new SimpleLightbox('.photo-card a', {
-          captionDelay: 150,
-          captionsData: 'alt',
-        });
-
+        // this.#onAddClassBtn();
+        // this.#onImageMarkupCardList(data.hits);
         return;
-      } else if (this.page >= 2) {
-        // console.log(data.totalHits);
-        Notify.info(`Hooray! We found ${data.totalHits} images.`);
-        this.#onImageMarkupCardList(data.hits);
+      } else if (this.page >= 1) {
+        Notify.info(
+          `Hooray! We found ${data.totalHits} images. Current page is ${this.page} from ${pagesToShow} pages`,
+        );
         this.#onRemoveClassBtn();
-        let galleryImg = new SimpleLightbox('.photo-card a', {
-          captionDelay: 150,
-          captionsData: 'alt',
-        });
+        // this.#onImageMarkupCardList(data.hits);
         return;
       } else {
-        this.#onImageMarkupCardList(data.hits);
         this.#onRemoveClassBtn();
-        new SimpleLightbox('.photo-card a', {
-          captionDelay: 150,
-          captionsData: 'alt',
-        });
+        // this.#onImageMarkupCardList(data.hits);
       }
     } catch (err) {
       console.log(err.message);
@@ -110,6 +101,10 @@ export default class ApiFetchService {
     const markup = imagesCard.map(image => this.#onImageMarkupCard(image)).join('');
     // console.log(markup);
     this.markupInsertHTML.insertAdjacentHTML('beforeend', markup);
+    new SimpleLightbox('.photo-card a', {
+      captionDelay: 150,
+      captionsData: 'alt',
+    });
   }
   #onRemoveClassBtn() {
     this.loadMorePositionData.classList.remove('is-hidden');

@@ -19,7 +19,9 @@ async function onSubmitSearch(evt) {
 
   clearGalleryMarkup();
   if (evt.target.firstElementChild.value.trim() === '') {
-    return Notify.info('Please enter the query parameters.');
+    apiFetchService.newSearchQuery = '';
+    Notify.info('Please enter the query parameters.');
+    return;
   }
   apiFetchService.pageToLoad = 1;
   apiFetchService.query = evt.target.firstElementChild.value.trim();
@@ -33,7 +35,7 @@ function onLoadMore() {
   apiFetchService.pageToLoad = apiFetchService.currentPage + 1;
   apiFetchService.fetchImages();
 
-  console.log(apiFetchService.currentPage);
+  // console.log(apiFetchService.currentPage);
 }
 
 function clearGalleryMarkup() {
