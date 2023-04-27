@@ -19,7 +19,7 @@ async function onSubmitSearch(evt) {
 
   clearGalleryMarkup();
   if (evt.target.firstElementChild.value.trim() === '') {
-    apiFetchService.newSearchQuery = '';
+    refs.loadMoreBtn.classList.add('is-hidden');
     Notify.info('Please enter the query parameters.');
     return;
   }
@@ -29,6 +29,7 @@ async function onSubmitSearch(evt) {
   apiFetchService.loadMoreBtnPosition = refs.loadMoreBtn;
 
   apiFetchService.fetchImages();
+  // console.log(apiFetchService.currentPage);
 }
 
 function onLoadMore() {

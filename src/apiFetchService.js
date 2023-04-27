@@ -6,6 +6,10 @@ const FETCH_URL = 'https://pixabay.com/api/';
 const API_KEY = '35728571-e5e325dee746f09c3ee4748c1';
 const PARAMS = 'image_type=photo&orientation=horizontal&safesearch=true';
 const quantityImg = 40;
+let gallery = new SimpleLightbox('.photo-card a', {
+  captionDelay: 150,
+  captionsData: 'alt',
+});
 
 export default class ApiFetchService {
   constructor() {
@@ -21,32 +25,35 @@ export default class ApiFetchService {
       const response = await axios.get(
         `${FETCH_URL}?key=${API_KEY}&q=${this.searchQuery}&${PARAMS}&per_page=${quantityImg}&page=${this.page}`,
       );
-      // console.log(response);
       const data = await response.data;
       let pagesToShow = Math.floor(data.totalHits / quantityImg);
 
       if (data.total === 0) {
         Notify.failure('Sorry, there are no images matching your search query. Please try again.');
-        // this.#onAddClassBtn();
         return;
       }
       await this.#onImageMarkupCardList(data.hits);
-      // else
+
       if (this.page === pagesToShow) {
         Notify.info("We're sorry, but you've reached the end of search results.");
-        // this.#onAddClassBtn();
-        // this.#onImageMarkupCardList(data.hits);
         return;
-      } else if (this.page >= 1) {
+      } else if (pagesToShow === 0) {
+        gallery.refresh();
+        this.#onAddClassBtn();
         Notify.info(
           `Hooray! We found ${data.totalHits} images. Current page is ${this.page} from ${pagesToShow} pages`,
         );
+        return;
+      } else if (this.page >= 1 && this.page !== pagesToShow) {
+        gallery.refresh();
         this.#onRemoveClassBtn();
-        // this.#onImageMarkupCardList(data.hits);
+        Notify.info(
+          `Hooray! We found ${data.totalHits} images. Current page is ${this.page} from ${pagesToShow} pages`,
+        );
         return;
       } else {
+        gallery.refresh();
         this.#onRemoveClassBtn();
-        // this.#onImageMarkupCardList(data.hits);
       }
     } catch (err) {
       console.log(err.message);
@@ -73,7 +80,6 @@ export default class ApiFetchService {
   }
 
   set loadMoreBtnPosition(position) {
-    // console.log(position);
     this.loadMorePositionData = position;
   }
 
@@ -99,12 +105,7 @@ export default class ApiFetchService {
 
   #onImageMarkupCardList(imagesCard) {
     const markup = imagesCard.map(image => this.#onImageMarkupCard(image)).join('');
-    // console.log(markup);
     this.markupInsertHTML.insertAdjacentHTML('beforeend', markup);
-    new SimpleLightbox('.photo-card a', {
-      captionDelay: 150,
-      captionsData: 'alt',
-    });
   }
   #onRemoveClassBtn() {
     this.loadMorePositionData.classList.remove('is-hidden');
