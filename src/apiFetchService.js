@@ -26,7 +26,7 @@ export default class ApiFetchService {
         `${FETCH_URL}?key=${API_KEY}&q=${this.searchQuery}&${PARAMS}&per_page=${quantityImg}&page=${this.page}`,
       );
       const data = await response.data;
-      let pagesToShow = Math.floor(data.totalHits / quantityImg);
+      let pagesToShow = Math.round(data.totalHits / quantityImg);
 
       if (data.total === 0) {
         Notify.failure('Sorry, there are no images matching your search query. Please try again.');
@@ -35,24 +35,24 @@ export default class ApiFetchService {
       await this.#onImageMarkupCardList(data.hits);
 
       if (this.page === pagesToShow) {
+        console.log('object');
         Notify.info("We're sorry, but you've reached the end of search results.");
         return;
-      } else if (pagesToShow === 0) {
-        gallery.refresh();
+      }
+      // add this section for remove loadmore button if pages to show only one after query
+      else if (pagesToShow === 0) {
         this.#onAddClassBtn();
         Notify.info(
           `Hooray! We found ${data.totalHits} images. Current page is ${this.page} from ${pagesToShow} pages`,
         );
         return;
       } else if (this.page >= 1 && this.page !== pagesToShow) {
-        gallery.refresh();
         this.#onRemoveClassBtn();
         Notify.info(
           `Hooray! We found ${data.totalHits} images. Current page is ${this.page} from ${pagesToShow} pages`,
         );
         return;
       } else {
-        gallery.refresh();
         this.#onRemoveClassBtn();
       }
     } catch (err) {
@@ -106,6 +106,7 @@ export default class ApiFetchService {
   #onImageMarkupCardList(imagesCard) {
     const markup = imagesCard.map(image => this.#onImageMarkupCard(image)).join('');
     this.markupInsertHTML.insertAdjacentHTML('beforeend', markup);
+    gallery.refresh();
   }
   #onRemoveClassBtn() {
     this.loadMorePositionData.classList.remove('is-hidden');

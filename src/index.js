@@ -1,5 +1,5 @@
 import ApiFetchService from './apiFetchService';
-import SimpleLightbox from 'simplelightbox';
+// import SimpleLightbox from 'simplelightbox';
 import { Notify } from 'notiflix';
 
 const refs = {
